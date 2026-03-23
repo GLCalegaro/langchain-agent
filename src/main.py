@@ -1,37 +1,34 @@
-import builtins
-from typing import Literal
-
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from langgraph.graph.state import RunnableConfig
-from langchain_core.tracers.stdout import FunctionCallbackHandler
+from langgraph.pregel.main import asyncio
 from rich import print
 from rich.markdown import Markdown
 from rich.prompt import Prompt
 
+from checkpointer import build_checkpointer
+from context import Context
 from graph import build_graph
 from prompts import SYSTEM_PROMPT
+from utils import Connection, async_lifespan
 
 
-def main() -> None:
-    graph = build_graph()
+async def run_graph(connection: Connection) -> None:
+    checkpointer = build_checkpointer(connection)
+    graph = build_graph(checkpointer)
 
-    fn_handler_cb = FunctionCallbackHandler(function=builtins.print)
-    user_type: Literal["plus", "enterprise"] = "plus"
+    context = Context(user_type="plus")
+
     config = RunnableConfig(
-        run_name="meu_grafo",
-        tags=["enterprise"],
-        configurable={"thread_id": 1, "user_type": user_type},
-        max_concurrency=4,
-        recursion_limit=25,
-        # callbacks=[fn_handler_cb],
+        configurable={"thread_id": 1},
     )
+
     all_messages: list[BaseMessage] = []
 
     prompt = Prompt()
     Prompt.prompt_suffix = ""
 
     while True:
-        user_input = prompt.ask("[bold cyan]Digite sua mensagem: \n")
+        user_input = prompt.ask("[bold cyan]Você: \n")
         print(Markdown("\n\n  ---  \n\n"))
 
         if user_input.lower() in ["q", "quit"]:
@@ -43,7 +40,9 @@ def main() -> None:
         if len(all_messages) == 0:
             current_loop_messages = [SystemMessage(SYSTEM_PROMPT), human_message]
 
-        result = graph.invoke({"messages": current_loop_messages}, config=config)
+        result = graph.invoke(
+            {"messages": current_loop_messages}, config=config, context=context
+        )
 
         model_name = ""
         last_message = result["messages"][-1]
@@ -61,5 +60,10 @@ def main() -> None:
     print(graph.get_state(config=config))
 
 
+async def main() -> None:
+    async with async_lifespan() as connection:
+        await run_graph(connection)
+
+
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

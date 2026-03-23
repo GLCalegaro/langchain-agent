@@ -1,7 +1,7 @@
 from langgraph.prebuilt.tool_node import ToolNode
 from langgraph.runtime import Runtime
-from langgraph.graph.state import RunnableConfig
 
+from context import Context
 from state import State
 from tools import TOOLS
 from utils import load_llm
@@ -9,9 +9,10 @@ from utils import load_llm
 tool_node = ToolNode(tools=TOOLS)
 
 
-def call_llm(state: State, config: RunnableConfig) -> State:
+def call_llm(state: State, runtime: Runtime[Context]) -> State:
     print("> call llm")
-    user_type = config.get("configurable", {}).get("user_type")
+    ctx = runtime.context
+    user_type = ctx.user_type
     model_provider = "google_genai" if user_type == "plus" else "google_genai"  # noqa: RUF034
     model = "gemini-2.5-flash" if user_type == "plus" else "gemini-2.5-flash"
 

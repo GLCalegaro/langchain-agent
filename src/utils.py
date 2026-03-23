@@ -8,9 +8,12 @@ from typing import cast
 
 from langchain.chat_models import BaseChatModel, init_chat_model
 
-# Load .env file if it exists
-from dotenv import load_dotenv
-load_dotenv(Path(__file__).parent.parent / ".env")
+# Load .env file if it exists (opcional - para desenvolvimento local)
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).parent.parent / ".env")
+except ImportError:
+    pass
 
 # def load_llm() -> BaseChatModel:
 #     model = cast(

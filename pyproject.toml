@@ -19,6 +19,7 @@ dependencies = [
   "rich>=14.2.0",
   "langchain-brightdata<=0.2.0",
   "streamlit>=1.50.0",
+  "python-dotenv>=1.0.0",
 ]
 
 [project.urls]

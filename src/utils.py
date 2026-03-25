@@ -15,18 +15,6 @@ try:
 except ImportError:
     pass
 
-# def load_llm() -> BaseChatModel:
-#     model = cast(
-#         "BaseChatModel",
-#         init_chat_model(
-#             model="gpt-oss:20b",
-#             model_provider="ollama",
-#             # base_url="http://127.0.0.1:11434",
-#             temperature=0.2,
-#             configurable_fields="any",
-#         ),
-#     )
-
 def load_llm() -> BaseChatModel:
     # Get API key from environment
     api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
@@ -55,31 +43,37 @@ def load_llm() -> BaseChatModel:
 
     return model
 
-class Connection:
-    def use(self) -> None:
-        print("Ok, estou usando a connection...")
-
-    def open_connection(self) -> None:
-        print("Connection Opened")
-
-    def close_connection(self) -> None:
-        print("Connection Closed")
-
-
-@lru_cache
-def get_connection() -> Connection:
-    return Connection()
-
-
-@contextmanager
-def sync_lifespan() -> Generator[Connection]:
-    print("Sync Abri")
-    yield get_connection()
-    print("Sync Fechei")
-
 
 @asynccontextmanager
-async def async_lifespan() -> AsyncGenerator[Connection]:
+async def async_lifespan() -> AsyncGenerator[None]:
     print("Async Abri")
-    yield get_connection()
+    yield
     print("Async Fechei")
+
+
+def sanitize_response(response: str | list | dict) -> str:
+    """
+    Remove metadados sensíveis (tokens, signatures, IDs) da resposta do LLM.
+    Garante que apenas texto limpo seja retornado.
+    """
+    # Se for lista (formato do Google Gemini)
+    if isinstance(response, list):
+        text_parts = []
+        for item in response:
+            if isinstance(item, dict) and item.get("type") == "text":
+                # Extrai APENAS o campo 'text', descarta 'extras' e outros metadados
+                text_content = item.get("text", "").strip()
+                if text_content:
+                    text_parts.append(text_content)
+        return "\n".join(text_parts) if text_parts else ""
+    
+    # Se for dicionário, tenta extrair o texto
+    if isinstance(response, dict):
+        return response.get("text", str(response)).strip()
+    
+    # Se for string, retorna como está
+    if isinstance(response, str):
+        return response.strip()
+    
+    # Fallback para qualquer outro tipo
+    return str(response).strip()

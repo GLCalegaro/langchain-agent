@@ -1,19 +1,20 @@
-from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from langgraph.graph.state import RunnableConfig
-from langgraph.pregel.main import asyncio
+from langgraph.pregel.main import BaseCheckpointSaver, asyncio
 from rich import print
 from rich.markdown import Markdown
 from rich.prompt import Prompt
 
-from checkpointer import build_checkpointer
+from checkpointer import (
+    build_checkpointer_sqlite,
+)
+from constants import DB_DSN
 from context import Context
 from graph import build_graph
-from prompts import SYSTEM_PROMPT
-from utils import Connection, async_lifespan
+from utils import async_lifespan
 
 
-async def run_graph(connection: Connection) -> None:
-    checkpointer = build_checkpointer(connection)
+async def run_graph(checkpointer: BaseCheckpointSaver) -> None:
     graph = build_graph(checkpointer)
 
     context = Context(user_type="plus")
@@ -37,10 +38,10 @@ async def run_graph(connection: Connection) -> None:
         human_message = HumanMessage(user_input)
         current_loop_messages = [human_message]
 
-        if len(all_messages) == 0:
-            current_loop_messages = [SystemMessage(SYSTEM_PROMPT), human_message]
+        # if len(all_messages) == 0:
+        #     current_loop_messages = [SystemMessage(SYSTEM_PROMPT), human_message]
 
-        result = graph.invoke(
+        result = await graph.ainvoke(
             {"messages": current_loop_messages}, config=config, context=context
         )
 
@@ -57,12 +58,16 @@ async def run_graph(connection: Connection) -> None:
 
         all_messages = result["messages"]
 
-    print(graph.get_state(config=config))
+    print(await graph.aget_state(config=config))
 
 
 async def main() -> None:
-    async with async_lifespan() as connection:
-        await run_graph(connection)
+    async with (
+        async_lifespan(),
+        # build_checkpointer_psql(DB_DSN) as checkpointer,
+        build_checkpointer_sqlite(DB_DSN) as checkpointer,
+    ):
+        await run_graph(checkpointer)
 
 
 if __name__ == "__main__":

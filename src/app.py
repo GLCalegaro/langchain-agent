@@ -15,6 +15,7 @@ sys.path.append(str(ROOT / "src"))
 
 from graph import build_graph
 from prompts import SYSTEM_PROMPT
+from utils import sanitize_response
 
 st.set_page_config(page_title="Aryaz - Assistente de Moda - Demo", page_icon="👗", layout="centered")
 st.title("👗 Aryaz - Assistente de Moda Virtual")
@@ -48,7 +49,9 @@ for msg in st.session_state.messages:
     elif isinstance(msg, AIMessage):
         with st.chat_message("assistant"):
             # AIMessage às vezes tem .content ou .text dependendo da versão
-            st.markdown(getattr(msg, "content", None) or getattr(msg, "text", ""))
+            content = getattr(msg, "content", None) or getattr(msg, "text", "")
+            clean_content = sanitize_response(content)
+            st.markdown(clean_content)
 
 # Input do usuário
 user_input = st.chat_input("Digite sua mensagem...")
@@ -83,13 +86,14 @@ if user_input:
             result = graph.invoke({"messages": current_loop_messages}, config=config, context=context)
             last_message = result["messages"][-1]
 
+            # Extrai apenas o conteúdo de texto, rejeitando metadados sensíveis
             answer = getattr(last_message, "content", None) or getattr(last_message, "text", "")
             
-            # Se a resposta for uma lista (como do Google Gemini), extrai o texto
-            if isinstance(answer, list):
-                answer = "".join([item.get("text", "") for item in answer if isinstance(item, dict)])
+            # Sanitiza a resposta: remove tokens, signatures e outros metadados sensíveis
+            answer = sanitize_response(answer)
             
             st.markdown(answer)
 
     # Atualiza histórico completo com o retorno do grafo (igual seu main.py)
+    # Limpa mensagens de metadados que não devem ser exibidas novamente
     st.session_state.messages = result["messages"]

@@ -5,7 +5,7 @@ def suggest_outfit(user_style: str) -> str:
     """Sugere uma roupa baseada no estilo do usuário."""
     if "casual" in user_style:
         return "Uma camiseta básica com jeans e tênis."
-    return "Um vestido elegante com salto alto."
+    return "Recomenda roupas e acessórios baseados no estilo, ocasião, clima e gênero.."
 
 @tool
 def late_delivery(user_complain: str) -> str:

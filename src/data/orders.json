@@ -1,0 +1,26 @@
+[
+  {
+    "order_id": "ARY-1001",
+    "status": "delayed",
+    "expected_delivery": "2026-07-28",
+    "history": ["Pedido confirmado", "Em transporte", "Atraso operacional"],
+    "item_ids": ["PRD-101", "PRD-102"],
+    "return_eligible": false
+  },
+  {
+    "order_id": "ARY-1002",
+    "status": "delivered",
+    "expected_delivery": "2026-07-20",
+    "history": ["Pedido confirmado", "Em transporte", "Entregue"],
+    "item_ids": ["PRD-103"],
+    "return_eligible": true
+  },
+  {
+    "order_id": "ARY-1003",
+    "status": "in_transit",
+    "expected_delivery": "2026-07-25",
+    "history": ["Pedido confirmado", "Em transporte"],
+    "item_ids": ["PRD-104", "PRD-105"],
+    "return_eligible": false
+  }
+]

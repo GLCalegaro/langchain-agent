@@ -1,29 +1,30 @@
 [project]
-name = "z"
-version = "0.0.1"
-description = "react_agent"
-readme = "README.md"
+name = "aryaz-langchain-agent"
+version = "0.1.0"
+description = "Assistente virtual de moda com LangChain, LangGraph e Streamlit"
+readme = "README.MD"
 license = "MIT"
 authors = [{ name = "Giovanna Calegaro" }]
 requires-python = ">=3.13"
 dependencies = [
-  "aiosqlite>=0.21.0",
   "langchain[google-genai]>=1.0.8",
   "langchain-core>=1.0.7",
   "langchain-google-genai>=3.1.0",
-  "langchain-ollama>=1.0.0",
   "langgraph>=1.0.3",
   "langgraph-checkpoint-postgres>=3.0.1",
-  "langgraph-checkpoint-sqlite>=3.0.0",
-  "psycopg[binary]>=3.3.2",
+  "psycopg[binary,pool]>=3.3.2",
+  "pydantic>=2.10.0",
   "rich>=14.2.0",
-  "langchain-brightdata<=0.2.0",
   "streamlit>=1.50.0",
   "python-dotenv>=1.0.0",
 ]
 
-[project.urls]
-Homepage = "https://github.com/luminati-io/langchain-brightdata"
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3.0",
+  "pyright>=1.1.400",
+  "ruff>=0.11.0",
+]
 
 [tool.ruff]
 line-length = 88
@@ -77,6 +78,9 @@ executionEnvironments = [{ root = "src" }]
 addopts = "-s --color=yes --tb=short"
 pythonpath = ["src"]
 testpaths = ["tests"]
+markers = [
+  "integration: requires an external PostgreSQL instance",
+]
 
 [build-system]
 requires = ["setuptools", "wheel"]
@@ -84,9 +88,6 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-
-[tool.hatch.build.targets.wheel]
-packages = ["langchain_brightdata"]
 
 [tool.setuptools]
 package-dir = { "" = "src" }

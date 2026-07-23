@@ -1,0 +1,56 @@
+[
+  {
+    "product_id": "PRD-101",
+    "name": "Camiseta Essencial",
+    "category": "camiseta",
+    "sizes": ["P", "M", "G", "GG"],
+    "colors": ["branco", "preto"],
+    "occasions": ["casual", "passeio"],
+    "price": 59.9
+  },
+  {
+    "product_id": "PRD-102",
+    "name": "Calça Jeans Reta",
+    "category": "calça",
+    "sizes": ["36", "38", "40", "42", "44"],
+    "colors": ["azul"],
+    "occasions": ["casual", "trabalho", "passeio"],
+    "price": 159.9
+  },
+  {
+    "product_id": "PRD-103",
+    "name": "Blazer Alfaiataria",
+    "category": "blazer",
+    "sizes": ["P", "M", "G"],
+    "colors": ["preto", "verde"],
+    "occasions": ["trabalho", "evento"],
+    "price": 249.9
+  },
+  {
+    "product_id": "PRD-104",
+    "name": "Vestido Midi",
+    "category": "vestido",
+    "sizes": ["P", "M", "G", "GG"],
+    "colors": ["vermelho", "preto"],
+    "occasions": ["evento", "jantar", "passeio"],
+    "price": 189.9
+  },
+  {
+    "product_id": "PRD-105",
+    "name": "Tênis Urbano",
+    "category": "calçado",
+    "sizes": ["35", "36", "37", "38", "39", "40", "41", "42"],
+    "colors": ["branco", "preto"],
+    "occasions": ["casual", "passeio", "trabalho"],
+    "price": 199.9
+  },
+  {
+    "product_id": "PRD-106",
+    "name": "Cardigan Leve",
+    "category": "cardigan",
+    "sizes": ["P", "M", "G"],
+    "colors": ["cinza", "rosa"],
+    "occasions": ["casual", "trabalho"],
+    "price": 129.9
+  }
+]

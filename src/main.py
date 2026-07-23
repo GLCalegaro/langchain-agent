@@ -6,7 +6,7 @@ from rich.markdown import Markdown
 from rich.prompt import Prompt
 
 from checkpointer import (
-    build_checkpointer_sqlite,
+    build_checkpointer_psql,
 )
 from constants import DB_DSN
 from context import Context
@@ -65,7 +65,7 @@ async def main() -> None:
     async with (
         async_lifespan(),
         # build_checkpointer_psql(DB_DSN) as checkpointer,
-        build_checkpointer_sqlite(DB_DSN) as checkpointer,
+        build_checkpointer_psql(DB_DSN) as checkpointer,
     ):
         await run_graph(checkpointer)
 
